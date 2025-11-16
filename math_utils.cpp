@@ -1,5 +1,6 @@
 #include "math_utils.hpp"
 #include <cmath>
+#include <algorithm>
 
 namespace math_utils {
 
@@ -12,6 +13,11 @@ std::pair<float, float> extract_yaw_pitch(const glm::vec3 &forward) {
     yaw = glm::degrees(yaw);
     pitch = glm::degrees(pitch);
     return {yaw, pitch};
+}
+
+double map_range(double value, double in_min, double in_max, double out_min, double out_max) {
+    value = std::clamp(value, in_min, in_max);
+    return out_min + (value - in_min) * (out_max - out_min) / (in_max - in_min);
 }
 
 } // namespace math_utils
