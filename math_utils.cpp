@@ -1,6 +1,7 @@
 #include "math_utils.hpp"
 #include <cmath>
 #include <algorithm>
+#include <numeric>
 
 namespace math_utils {
 
@@ -19,5 +20,25 @@ double map_range(double value, double in_min, double in_max, double out_min, dou
     value = std::clamp(value, in_min, in_max);
     return out_min + (value - in_min) * (out_max - out_min) / (in_max - in_min);
 }
+
+double compute_mean(const std::vector<double> &values) {
+    if (values.empty())
+        return 0.0;
+    double sum = std::accumulate(values.begin(), values.end(), 0.0);
+    return sum / static_cast<double>(values.size());
+}
+
+double compute_variance(const std::vector<double> &values) {
+    if (values.empty())
+        return 0.0;
+    double mean = compute_mean(values);
+    double var_sum = 0.0;
+    for (double x : values) {
+        double diff = x - mean;
+        var_sum += diff * diff;
+    }
+    return var_sum / static_cast<double>(values.size());
+}
+double compute_stddev(const std::vector<double> &values) { return std::sqrt(compute_variance(values)); }
 
 } // namespace math_utils
