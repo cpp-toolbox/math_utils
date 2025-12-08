@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <deque>
 
 namespace math_utils {
 
@@ -133,6 +134,37 @@ class ExponentialMovingAverage {
     double alpha;           ///< smoothing factor (0 < alpha <= 1)
     bool has_value;         ///< true if the first sample has been added
     double current_average; ///< current EMA value
+};
+
+class SimpleMovingAverage {
+  public:
+    /// @brief Construct a SMA with a fixed window size.
+    /// @param window_size Number of recent samples to average.
+    explicit SimpleMovingAverage(size_t window_size) : window_size(window_size), sum(0.0) {}
+
+    /// @brief Add a new sample to the moving average.
+    void add_sample(double value) {
+        samples.push_back(value);
+        sum += value;
+
+        // Remove oldest sample if we exceed window size
+        if (samples.size() > window_size) {
+            sum -= samples.front();
+            samples.pop_front();
+        }
+    }
+
+    /// @brief Get the current simple moving average.
+    double get() const {
+        if (samples.empty())
+            return 0.0;
+        return sum / samples.size();
+    }
+
+  private:
+    size_t window_size;         ///< number of samples to average
+    std::deque<double> samples; ///< circular buffer for last N samples
+    double sum;                 ///< sum of samples for fast average calculation
 };
 
 } // namespace math_utils
