@@ -311,6 +311,33 @@ class PerlinNoise {
         // normalize to [0,1]
         return (result + 1.0) / 2.0;
     }
+
+    /**
+     * @brief this function returns an image of the current noise
+     *
+     * usage:
+     * @code
+     * size_t width = 512, height = 512;
+     * auto image = perlin_noise.get_noise_image(width, height);
+     * stbi_write_png("perlin.png", width, height, 1, image.data(), width);
+     * @endcode
+     *
+     */
+    std::vector<unsigned char> get_noise_image(size_t width = 512, size_t height = 512) {
+
+        std::vector<unsigned char> image(width * height);
+
+        double scale = 0.01; // zoom in/out of noise
+
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                double n = at(x * scale, y * scale, 0.0); // 0..1
+                image[y * width + x] = static_cast<unsigned char>(n * 255);
+            }
+        }
+
+        return image;
+    }
 };
 
 } // namespace math_utils
