@@ -41,4 +41,22 @@ double compute_variance(const std::vector<double> &values) {
 }
 double compute_stddev(const std::vector<double> &values) { return std::sqrt(compute_variance(values)); }
 
+std::vector<double> equally_spaced_points(int n, double start, double end) {
+    std::vector<double> points;
+    if (n <= 0)
+        return points;
+
+    if (n == 1) {
+        points.push_back(start);
+        return points;
+    }
+
+    points.reserve(n);
+    double step = (end - start) / (n - 1); // n-1 intervals
+    for (int i = 0; i < n; ++i) {
+        points.push_back(start + i * step);
+    }
+    return points;
+}
+
 } // namespace math_utils
