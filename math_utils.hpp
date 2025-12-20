@@ -52,6 +52,10 @@ std::pair<float, float> extract_yaw_pitch(const glm::vec3 &forward);
  */
 double map_range(double value, double in_min, double in_max, double out_min, double out_max);
 
+template <typename T> T clamp(const T &n, const T &lower, const T &upper) {
+    return std::max(lower, std::min(n, upper));
+}
+
 /**
  * @brief Computes the arithmetic mean of a vector of doubles.
  *
