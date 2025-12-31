@@ -90,6 +90,78 @@ double compute_stddev(const std::vector<double> &values);
 
 std::vector<double> equally_spaced_points(int n, double start, double end);
 
+/**
+ * @brief Evaluates a cubic Hermite spline in 3D.
+ *
+ * Computes a point along a cubic Hermite curve defined by two endpoints and
+ * their corresponding tangent (first-derivative) vectors. The curve exactly
+ * interpolates the endpoints and matches the specified derivatives at
+ * t = 0 and t = 1.
+ *
+ * The spline satisfies:
+ *  - C(0)  = p0
+ *  - C(1)  = p1
+ *  - C'(0) = t0
+ *  - C'(1) = t1
+ *
+ * @param p0 Start point of the spline.
+ * @param p1 End point of the spline.
+ * @param t0 Tangent (first derivative) at the start point.
+ * @param t1 Tangent (first derivative) at the end point.
+ * @param t  Interpolation parameter in the range [0, 1].
+ * @param scale_tangents_by_distance If true, tangents are scaled by distance between p0 and p1.
+ *
+ * @return The evaluated point on the spline at parameter t.
+ *
+ * @note The magnitudes of t0 and t1 influence the curvature of the spline.
+ *       For stable results, tangents are often scaled relative to the
+ *       distance between p0 and p1.
+ *
+ */
+glm::vec3 hermite_spline(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec3 &t0, const glm::vec3 &t1, float t,
+                         bool scale_tangents_by_distance = true);
+
+/**
+ * @brief Computes a best-fit plane normal for a set of 3D points.
+ *
+ * This function estimates a stable normal vector for a polygon embedded in 3D
+ * space using an area-weighted summation (Newell's method). The input points
+ * are assumed to form a closed loop describing a polygon boundary.
+ *
+ * @note
+ * - The points must be provided in consistent winding order.
+ * - If the points are collinear or degenerate, the returned vector will have
+ *   near-zero length.
+ * - The returned normal is NOT normalized.
+ *
+ * @param pts A collection of points describing a polygonal loop.
+ * @return An unnormalized normal vector representing the best-fit plane.
+ */
+glm::vec3 compute_best_fit_plane_normal(const std::vector<glm::vec3> &pts);
+
+/**
+ * @brief Determines whether a set of 3D points is approximately planar.
+ *
+ * This function computes a best-fit plane for the input points and measures
+ * the maximum perpendicular distance of each point from that plane. If all
+ * points lie within the specified tolerance, the set is considered planar.
+ *
+ * Planarity is evaluated using a single shared plane; this function is intended
+ * for validating polygonal input prior to operations such as triangulation.
+ *
+ * @note
+ * - The points are assumed to form a polygonal loop.
+ * - Degenerate input (fewer than 3 points or near-collinear points) will
+ *   return false.
+ * - The default epsilon is suitable for unit-scale geometry; callers may wish
+ *   to scale it based on scene size.
+ *
+ * @param pts A collection of points to test for planarity.
+ * @param epsilon Maximum allowed distance from the best-fit plane.
+ * @return True if all points lie within @p epsilon of the plane, false otherwise.
+ */
+bool points_are_planar(const std::vector<glm::vec3> &pts, float epsilon = 1e-4f);
+
 /*
  * @brief Exponential Moving Average (EMA) helper class.
  *
