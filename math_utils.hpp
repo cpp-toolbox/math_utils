@@ -405,8 +405,8 @@ class PerlinNoise {
 
         double scale = 0.01; // zoom in/out of noise
 
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
+        for (size_t y = 0; y < height; ++y) {
+            for (size_t x = 0; x < width; ++x) {
                 double n = at(x * scale, y * scale, 0.0); // 0..1
                 image[y * width + x] = static_cast<unsigned char>(n * 255);
             }
