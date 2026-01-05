@@ -23,6 +23,40 @@ namespace math_utils {
 int non_neg_mod(int value, int mod);
 
 /**
+ * @brief Computes all square grid indices intersected by a straight line.
+ *
+ * Optionally starts from the center of the first cell.
+ *
+ * @param col1 Starting column index.
+ * @param row1 Starting row index.
+ * @param col2 Ending column index.
+ * @param row2 Ending row index.
+ * @param from_center If true, the line starts/ends at the center of the cells.
+ *
+ * @return Vector of grid indices (col, row) in order along the line.
+ */
+std::vector<glm::ivec2> get_square_grid_indices_along_line(int col1, int row1, int col2, int row2,
+                                                           bool connect_line_segment_from_center_of_cell = false);
+
+/**
+ * @brief Computes all square grid indices whose square's center falls within an annulus (ring).
+ * @note this means that if s square would intersect we don't consider it part of the annuls instead it's center has to
+ * intersect, this was done to simplify the algorithm and can be improved later if required.
+ *
+ * The annulus is defined by inner and outer radii from a center cell.
+ * Distances are measured from cell centers.
+ *
+ * @param center_col Center column index.
+ * @param center_row Center row index.
+ * @param inner_radius Inner radius in grid units (exclusive).
+ * @param outer_radius Outer radius in grid units (inclusive).
+ *
+ * @return Vector of grid indices (col, row) within the annulus.
+ */
+std::vector<glm::ivec2> get_square_grid_indices_in_annulus(int center_col, int center_row, float inner_radius,
+                                                           float outer_radius);
+
+/**
  * @brief Extracts yaw and pitch angles (in degrees) from a 3D forward vector.
  *
  * The input vector is assumed to be a direction in 3D space. The function
