@@ -12,7 +12,7 @@ std::vector<glm::ivec2> get_square_grid_indices_along_line(int col1, int row1, i
     std::vector<glm::ivec2> grid_indices;
 
     if (!connect_line_segments_from_center_of_cell) {
-        // Standard integer Bresenham
+        // standard integer bresenham
         int x = col1;
         int y = row1;
 
@@ -91,6 +91,7 @@ std::vector<glm::ivec2> get_square_grid_indices_in_annulus(int center_col, int c
             float cell_x = col + 0.5f;
             float cell_y = row + 0.5f;
 
+            // note that distance is measured in grid units
             // distance from center cell to current cell (center-to-center)
             float dx = cell_x - center_x;
             float dy = cell_y - center_y;
@@ -98,6 +99,56 @@ std::vector<glm::ivec2> get_square_grid_indices_in_annulus(int center_col, int c
 
             // check if within annulus (inner_radius < distance <= outer_radius)
             if (dist_sq > inner_radius_sq && dist_sq <= outer_radius_sq) {
+                grid_indices.push_back(glm::ivec2(col, row));
+            }
+        }
+    }
+
+    return grid_indices;
+}
+
+std::vector<glm::ivec2> get_square_grid_indices_in_sector(int center_col, int center_row, glm::vec2 direction,
+                                                          float half_angle_extent_turns, float radius) {
+    std::vector<glm::ivec2> grid_indices;
+
+    // normalize the direction vector
+    if (glm::length(direction) == 0.0f) {
+        return grid_indices; // invalid direction
+    }
+    glm::vec2 dir_norm = glm::normalize(direction);
+
+    // bounding box around the center
+    int min_col = static_cast<int>(std::floor(center_col - radius));
+    int max_col = static_cast<int>(std::ceil(center_col + radius));
+    int min_row = static_cast<int>(std::floor(center_row - radius));
+    int max_row = static_cast<int>(std::ceil(center_row + radius));
+
+    float center_x = center_col + 0.5f;
+    float center_y = center_row + 0.5f;
+
+    float radius_sq = radius * radius;
+
+    for (int row = min_row; row <= max_row; ++row) {
+        for (int col = min_col; col <= max_col; ++col) {
+            float cell_x = col + 0.5f;
+            float cell_y = row + 0.5f;
+
+            float dx = cell_x - center_x;
+            float dy = cell_y - center_y;
+            float dist_sq = dx * dx + dy * dy;
+
+            // distance check: must be within radius
+            if (dist_sq > radius_sq) {
+                continue;
+            }
+
+            // angle check: compute cosine of angle between direction and cell vector
+            glm::vec2 to_cell(dx, dy);
+            to_cell = glm::normalize(to_cell);
+            float cos_angle = glm::dot(dir_norm, to_cell);
+
+            // include if within half-angle extent
+            if (cos_angle >= turns::cos_turns(half_angle_extent_turns)) {
                 grid_indices.push_back(glm::ivec2(col, row));
             }
         }

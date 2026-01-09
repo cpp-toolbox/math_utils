@@ -8,6 +8,8 @@
 #include <vector>
 #include <deque>
 
+#include "sbpt_generated_includes.hpp"
+
 namespace math_utils {
 
 /**
@@ -34,6 +36,7 @@ int non_neg_mod(int value, int mod);
  * @param from_center If true, the line starts/ends at the center of the cells.
  *
  * @return Vector of grid indices (col, row) in order along the line.
+ * @note the ordering is from point 1 to point 2
  */
 std::vector<glm::ivec2> get_square_grid_indices_along_line(int col1, int row1, int col2, int row2,
                                                            bool connect_line_segment_from_center_of_cell = false);
@@ -55,6 +58,27 @@ std::vector<glm::ivec2> get_square_grid_indices_along_line(int col1, int row1, i
  */
 std::vector<glm::ivec2> get_square_grid_indices_in_annulus(int center_col, int center_row, float inner_radius,
                                                            float outer_radius);
+/**
+ * @brief Computes all square grid indices whose centers fall within a circular sector (cone).
+ *
+ * The sector is defined by a center cell, a direction vector, a radius, and a half-angle extent.
+ * Only cells whose centers are within the radius and whose angle from the direction
+ * is less than or equal to the half-angle extent are included.
+ *
+ * @param center_col Column index of the center cell.
+ * @param center_row Row index of the center cell.
+ * @param direction 2D direction vector of the sector (does not need to be normalized).
+ * @param half_angle_extent Half of the sector's angle in radians.
+ * @param radius Radius of the sector in grid units.
+ *
+ * @return std::vector<glm::ivec2> Vector of grid indices (col, row) whose centers lie within the sector.
+ *
+ * @note Distances and angles are measured from cell centers.
+ *       The angle is measured between the direction vector and the vector
+ *       from the center cell to the candidate cell.
+ */
+std::vector<glm::ivec2> get_square_grid_indices_in_sector(int center_col, int center_row, glm::vec2 direction,
+                                                          float half_angle_extent_turns, float radius);
 
 /**
  * @brief Extracts yaw and pitch angles (in degrees) from a 3D forward vector.
